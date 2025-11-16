@@ -1,5 +1,5 @@
 streamlit
 google-generativeai
 youtube-transcript-api
-json
 NoTranscriptFound
+
