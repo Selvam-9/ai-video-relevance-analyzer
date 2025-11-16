@@ -1,9 +1,7 @@
-%%writefile app.py
 import streamlit as st
 import google.generativeai as genai
 from youtube_transcript_api import YouTubeTranscriptApi, NoTranscriptFound
 import re, json, os, time
-# No longer need pandas or altair
 
 # ---------------------------
 # Setup for GEMINI API
@@ -343,4 +341,5 @@ if submit_button:
         # --- [DEBUGGING FIX] ---
         # Added the raw transcript text here so you can see what the AI saw.
         with st.expander("Show Raw Transcript Sent to AI (for debugging)"):
+
             st.text(raw_transcript_text_for_debug)
