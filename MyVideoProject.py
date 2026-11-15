@@ -1,5 +1,6 @@
 import streamlit as st
-import google.generativeai as genai
+from google import genai
+from google.genai import types
 from youtube_transcript_api import YouTubeTranscriptApi, NoTranscriptFound
 import re, json, os, time
 
@@ -7,7 +8,7 @@ import re, json, os, time
 # Setup for GEMINI API
 # ---------------------------
 try:
-    genai.configure(api_key=st.secrets["GEMINI_API_KEY"])
+    client = genai.Client(api_key=st.secrets["GEMINI_API_KEY"])
 except KeyError:
     st.set_page_config(page_title="Error", page_icon="🚨", layout="wide")
     st.title("🚨 Configuration Error")
@@ -88,12 +89,9 @@ def analyze_video(title, description, transcript_chunks):
         "required": ["relevance_score", "justification", "irrelevant_segments", "tags", "summary", "key_points", "quarterly_summaries"]
     }
 
-    model = genai.GenerativeModel(
-        "gemini-2.5-flash",
-        generation_config={
-            "response_mime_type": "application/json",
-            "response_schema": schema
-        }
+    generation_config = types.GenerateContentConfig(
+        response_mime_type="application/json",
+        response_schema=schema
     )
 
     # --- [ THE FIX ] ---
@@ -134,7 +132,11 @@ def analyze_video(title, description, transcript_chunks):
     """
 
     try:
-        response = model.generate_content(prompt)
+        response = client.models.generate_content(
+            model="gemini-2.5-flash",
+            contents=prompt,
+            config=generation_config
+        )
         response_data = json.loads(response.text)
 
         # 1. Process Irrelevant Segments
